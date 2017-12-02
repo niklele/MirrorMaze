@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProjectionSettings : MonoBehaviour {
 
-    public enum Type { Wall=0, Mirror, Lens, Portal, Prism }
+    public enum Type { Wall=0, Mirror, Lens, Portal, Prism, Target }
 
     public Type type;
 

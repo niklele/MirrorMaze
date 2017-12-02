@@ -11,6 +11,7 @@ public class ManageProjections : MonoBehaviour {
 
     public GameObject key;
     public float maxDistance;
+    public float targetThreshold = 5; // degrees
 
     public GameObject imageObject;
     public bool drawImage;
@@ -56,7 +57,8 @@ public class ManageProjections : MonoBehaviour {
             if (Physics.Raycast(origin: curr.inputPos, direction: curr.outputRay, maxDistance: maxDistance, hitInfo: out hit))
             {
                 if (drawImage) {
-                    imageObject = Instantiate(imageObject) as GameObject;
+                    imageObject = Instantiate(imageObject);
+                    imageObject.name = string.Format("KeyImage {0}", hit.point);
                     imageObject.transform.position = hit.point;
                     imageObject.transform.rotation = curr.inputObj.transform.rotation;
                     imageObjects.Add(imageObject);
@@ -77,6 +79,15 @@ public class ManageProjections : MonoBehaviour {
                     case ProjectionSettings.Type.Lens: break;
                     case ProjectionSettings.Type.Portal: break;
                     case ProjectionSettings.Type.Prism: break;
+                    case ProjectionSettings.Type.Target:
+                        // check alignment to target
+                        // is there a better way than just checking for the same rotation?
+                        // note this doesn't accept symmetrical rotations
+                        if (Quaternion.Angle(curr.inputObj.transform.rotation, hitObj.transform.rotation) < targetThreshold)
+                        {
+                            print("matched rotation");
+                        }
+                        break;
                 }
                 
             }
