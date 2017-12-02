@@ -7,11 +7,15 @@ using UnityEngine;
  */
 public class ManageProjections : MonoBehaviour {
 
+    private Quaternion currRotation = Quaternion.identity;
+
     public GameObject key;
     public float maxDistance;
 
     public GameObject imageObject;
     public bool drawImage;
+
+    private List<GameObject> imageObjects = new List<GameObject>();
 
     // each node has:
     // - input image
@@ -55,11 +59,12 @@ public class ManageProjections : MonoBehaviour {
                     imageObject = Instantiate(imageObject) as GameObject;
                     imageObject.transform.position = hit.point;
                     imageObject.transform.rotation = curr.inputObj.transform.rotation;
+                    imageObjects.Add(imageObject);
                 }
 
                 // look at hitinfo
-                print(hit.point);
-                print(hit.collider.gameObject.name);
+                //print(hit.point);
+                //print(hit.collider.gameObject.name);
             
                 GameObject hitObj = hit.collider.gameObject;
                 var type = hitObj.GetComponent<ProjectionSettings>().type;
@@ -84,13 +89,25 @@ public class ManageProjections : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        currRotation = key.transform.rotation;
 
         // add key as start node
         CastRays(new ObjRay(key, key.transform.position, Vector3.forward));
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	void FixedUpdate () {
+		if (key.transform.rotation != currRotation)
+        {
+            // delete old image objects
+            imageObjects.RemoveAll(delegate (GameObject g)
+            {
+                Destroy(g);
+                return true;
+            });
+
+            // update and cast rays again
+            currRotation = gameObject.transform.rotation;
+            CastRays(new ObjRay(key, key.transform.position, Vector3.forward));
+        }
 	}
 }
